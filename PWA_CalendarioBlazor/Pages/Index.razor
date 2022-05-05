@@ -1,0 +1,80 @@
+﻿@page "/"
+
+<button @onclick="() => { mesContiguo--; CrearMes(); }">Mes anterior</button>
+<h1>@nomeMes, @ano</h1>
+<button @onclick="() => { mesContiguo++; CrearMes(); }">Mes seguinte</button>
+
+<!--Inicio section con cuadricula de 7 columnas e 5 filas-->
+<section>
+    @for (int i = 0; i < numColumna; i++)
+    {
+        <div>
+        </div>
+    }
+    @for (int i = 1; i <= finMes.Day; i++)
+    {
+        var elementoCalendario = elementosCalendario.FirstOrDefault(n => n.Data == new DateTime(ano, mes, i));
+        <div>
+            <h2>@i</h2>
+            @if(elementoCalendario!=null)
+            {
+                <p>@elementoCalendario.Nome</p>
+            }
+            </div>
+    }
+</section>
+<!--Fin section-->
+@code {
+    string nomeMes = "";
+    DateTime finMes;
+    int mesContiguo = 0; //mes anterior ou seguinte
+    int numColumna = 0;
+    int ano = 2022;
+    int mes = 0;
+    List<Calendario> elementosCalendario = new List<Calendario>();
+
+    protected override void OnInitialized()
+    {
+        elementosCalendario.Add(new Calendario(new DateTime(2022, 4, 28), "Dia dos inocentes,o 28 de abril van os burros onde non deben de ir"));
+        elementosCalendario.Add(new Calendario(new DateTime(2022, 11, 27), "Cumple"));
+        elementosCalendario.Add(new Calendario(new DateTime(2022, 12, 25), "Dia de Nadal"));
+        elementosCalendario.Add(new Calendario(new DateTime(2022, 1, 6), "Dia de Reis"));
+        CrearMes();
+    }
+
+    void CrearMes()
+    {
+        var dataTemporal = DateTime.Now.AddMonths(mesContiguo);
+        mes = dataTemporal.Month;
+        ano = dataTemporal.Year;
+
+
+        //se pasamos de Decembro, volvemos a Xaneiro e seguinte ano
+        //mes-1 porque chegados a 12 o modulo da 0 e non pode dar mes cero
+        //ano += (mes - 1) / 12;
+        //mes = ((mes - 1) % 12) + 1;
+
+        DateTime inicioMes = new DateTime(ano, mes, 1);
+        //primeiro dia do mes actual, inicio de calendario
+        finMes = inicioMes.AddMonths(1).AddDays(-1);
+        nomeMes = inicioMes.Month switch
+        {
+            1 => "Xaneiro",
+            2 => "Febreiro",
+            3 => "Marzo",
+            4 => "Abril",
+            5 => "Maio",
+            6 => "Xunho",
+            7 => "Xullo",
+            8 => "Agosto",
+            9 => "Setembro",
+            10 => "Outubro",
+            11 => "Novembro",
+            12 => "Decembro",
+            _ => ""
+        };
+
+        numColumna = (int)inicioMes.DayOfWeek;
+        //se da martes o resultado sera 2
+    }
+}
